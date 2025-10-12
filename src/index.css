@@ -1,0 +1,10 @@
+/* src/index.css （この内容に置き換えてください） */
+
+body {
+  margin: 0;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f0f0; /* アプリ外側の背景を明るいグレーに */
+}

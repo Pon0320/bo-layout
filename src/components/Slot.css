@@ -1,0 +1,38 @@
+.slot-container {
+  border: 2px solid;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  box-sizing: border-box;
+  position: absolute;
+  user-select: none;
+  color: #333;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+  overflow: hidden;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+}
+
+.slot-container:hover {
+  transform: scale(1.05);
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.slot-info {
+  /* No specific styles needed */
+}
+
+.slot-name {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.slot-category {
+  font-size: 12px;
+  opacity: 0.8;
+}
