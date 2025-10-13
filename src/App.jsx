@@ -18,6 +18,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryParent, setNewCategoryParent] = useState('');
+  const [newCategoryCode, setNewCategoryCode] = useState('');
   const [editingSlotId, setEditingSlotId] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [newSlotName, setNewSlotName] = useState('');
@@ -102,11 +103,19 @@ function App() {
     const newCategoryData = { name: newCategoryName, color: randomColor };
     if (newCategoryParent) {
       newCategoryData.parentId = newCategoryParent;
+      if (newCategoryCode) {
+        newCategoryData.genreCode = newCategoryCode;
+      }
+    } else {
+      if (newCategoryCode) {
+        newCategoryData.departmentCode = newCategoryCode;
+      }
     }
     const docRef = await addDoc(collection(db, "categories"), newCategoryData);
     setCategories(prev => [...prev, { id: docRef.id, ...newCategoryData }].sort((a,b) => a.name.localeCompare(b.name)));
     setNewCategoryName('');
     setNewCategoryParent('');
+    setNewCategoryCode('');
   };
 
   const handleDeleteCategory = async (categoryIdToDelete) => {
@@ -189,10 +198,14 @@ function App() {
       const slotName = slot.name || '';
       const categoryName = slot.assignedCategory ? slot.assignedCategory.name : '';
       const parentName = slot.parentCategory ? slot.parentCategory.name : '';
+      const deptCode = slot.parentCategory ? (slot.parentCategory.departmentCode || '') : (slot.assignedCategory ? (slot.assignedCategory.departmentCode || '') : '');
+      const genreCode = slot.assignedCategory ? (slot.assignedCategory.genreCode || '') : '';
       const lowerCaseSearchTerm = searchTerm.toLowerCase();
       return slotName.toLowerCase().includes(lowerCaseSearchTerm) || 
             categoryName.toLowerCase().includes(lowerCaseSearchTerm) ||
-            parentName.toLowerCase().includes(lowerCaseSearchTerm);
+            parentName.toLowerCase().includes(lowerCaseSearchTerm) ||
+            deptCode.includes(lowerCaseSearchTerm) ||
+            genreCode.includes(lowerCaseSearchTerm);
     });
 
   const editingSlot = editingSlotId ? displaySlots.find(slot => slot.id === editingSlotId) : null;
@@ -206,7 +219,7 @@ function App() {
         <div className="sidebar-content">
           <div className="sidebar-section">
             <h2>検索</h2>
-            <input type="text" placeholder="スロット名やカテゴリ名で検索..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input"/>
+            <input type="text" placeholder="棚名、カテゴリ名、各種コードで検索..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input"/>
           </div>
           <div className="sidebar-section">
             <h2>モード</h2>
@@ -254,13 +267,19 @@ function App() {
                       <div key={parent.id}>
                         <li>
                           <span className="category-color-dot" style={{backgroundColor: parent.color}}></span>
-                          <strong>{parent.name}</strong>
+                          <span className="category-text">
+                            <strong>{parent.name}</strong>
+                            {parent.departmentCode && <span className="category-code">[{parent.departmentCode}]</span>}
+                          </span>
                           <button onClick={() => handleDeleteCategory(parent.id)} className="delete-button-small">×</button>
                         </li>
                         {childCategories.filter(child => child.parentId === parent.id).map(child => (
                           <li key={child.id} className="child-category">
                             <span className="category-color-dot" style={{backgroundColor: child.color}}></span>
-                            {child.name}
+                             <span className="category-text">
+                                {child.name}
+                                {child.genreCode && <span className="category-code">[{child.genreCode}]</span>}
+                             </span>
                             <button onClick={() => handleDeleteCategory(child.id)} className="delete-button-small">×</button>
                           </li>
                         ))}
@@ -275,6 +294,12 @@ function App() {
                         <option key={parent.id} value={parent.id}>{parent.name}</option>
                       ))}
                     </select>
+                    <input 
+                      type="text" 
+                      placeholder={newCategoryParent ? "ジャンル番号" : "部門コード"}
+                      value={newCategoryCode}
+                      onChange={(e) => setNewCategoryCode(e.target.value)} 
+                    />
                     <button type="submit">カテゴリ追加</button>
                   </form>
                 </div>
@@ -287,6 +312,8 @@ function App() {
         {!isSidebarVisible && (
           <button onClick={() => setIsSidebarVisible(true)} className="toggle-sidebar-button show-button">▶</button>
         )}
+        
+        {/* ★★★ フロアタブのJSXをここに追加 ★★★ */}
         <div className="floor-tabs">
           {floors.map(floor => (
             <button 
@@ -298,6 +325,7 @@ function App() {
             </button>
           ))}
         </div>
+
         <TransformWrapper
           initialScale={1}
           minScale={0.2}
@@ -305,6 +333,7 @@ function App() {
           limitToBounds={false}
           panning={{ disabled: isEditMode, excluded: ["slot-container"] }}
           wheel={{ step: 0.1 }}
+          doubleClick={{ disabled: true }}
         >
           {({ zoomIn, zoomOut, resetTransform }) => (
             <>

@@ -141,12 +141,11 @@
 
 .floor-tabs {
   background-color: #f8f9fa;
-  /* padding: 5px 20px 0; ← 変更前 */
-  padding: 5px 20px 0 60px; /* ★★★ 左側に60pxの余白を追加 ★★★ */
+  padding: 5px 20px 0 60px;
   border-bottom: 1px solid #dee2e6;
   flex-shrink: 0;
-  position: relative; /* z-indexを効かせるため */
-  z-index: 15;      /* ツールボタン(20)よりは下、マップ(なし)よりは上 */
+  position: relative;
+  z-index: 15;
 }
 
 .floor-tab {
@@ -233,6 +232,20 @@
 .category-list li.child-category {
   padding-left: 25px;
 }
+
+.category-text {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.category-code {
+  font-size: 11px;
+  color: #6c757d;
+  background-color: #e9ecef;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
 .category-color-dot {
   width: 12px;
   height: 12px;
@@ -314,9 +327,7 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  z-index: 20; /* z-indexをツールボタンと同じレベルに */
-  padding: 5px 12px;
-  font-size: 16px;
+  z-index: 20;
 }
 
 .edit-mode-toggle {

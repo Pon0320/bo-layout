@@ -29,11 +29,6 @@ function Slot({ slotData, isEditMode, onSlotClick, onDeleteSlot }) {
   const draggableProps = isEditMode ? { ...listeners, ...attributes } : {};
   const containerClassName = `slot-container ${isEditMode ? 'draggable' : 'clickable'} ${isVertical ? 'vertical' : ''}`;
 
-  const handleDeleteClick = (e) => {
-    e.stopPropagation();
-    onDeleteSlot(id);
-  };
-
   return (
     <div
       ref={setNodeRef}
@@ -42,15 +37,18 @@ function Slot({ slotData, isEditMode, onSlotClick, onDeleteSlot }) {
       onClick={onSlotClick}
       {...draggableProps}
     >
-      {isEditMode && (
-        <button onClick={handleDeleteClick} className="delete-slot-button">×</button>
-      )}
       <div className="slot-info">
-        <span className="slot-name">{name}</span>
+        {/* ★★★ 棚の名前を表示する条件を削除 ★★★ */}
         <span className="slot-category">
           {parentCategory && `${parentCategory.name} / `}
           {assignedCategory ? assignedCategory.name : '（未割り当て）'}
         </span>
+        {(assignedCategory || parentCategory) && (
+            <span className="slot-code">
+                {parentCategory?.departmentCode || assignedCategory?.departmentCode || ''}
+                {assignedCategory?.genreCode && `-${assignedCategory.genreCode}`}
+            </span>
+        )}
       </div>
     </div>
   );
