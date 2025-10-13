@@ -5,7 +5,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 8px;
+  padding: 4px;
   box-sizing: border-box;
   position: absolute;
   user-select: none;
@@ -13,26 +13,71 @@
   box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
   overflow: hidden;
   text-align: center;
-  cursor: pointer;
   transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
 }
 
-.slot-container:hover {
+/* 削除ボタンのスタイルは不要になったので削除 */
+
+.slot-container.clickable:hover {
   transform: scale(1.05);
   box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
   z-index: 10;
 }
 
+.slot-container.clickable {
+  cursor: pointer;
+}
+
+.slot-container.draggable {
+  cursor: grab;
+  border-style: dashed;
+}
+
+.slot-container.draggable:active {
+  cursor: grabbing;
+  z-index: 20;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+}
+
 .slot-info {
-  /* No specific styles needed */
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .slot-name {
   font-weight: bold;
-  font-size: 14px;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
 }
 
 .slot-category {
-  font-size: 12px;
+  font-size: 10px;
   opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
+}
+
+.slot-container.vertical .slot-info {
+  writing-mode: vertical-rl;
+  text-align: center;
+  align-items: center;
+  height: 100%;
+  width: auto;
+}
+
+.slot-container.vertical .slot-name,
+.slot-container.vertical .slot-category {
+  width: auto;
+  writing-mode: vertical-rl;
+  text-overflow: ellipsis; 
+  max-height: 100%;
 }
