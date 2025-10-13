@@ -23,7 +23,7 @@ function App() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [newSlotName, setNewSlotName] = useState('');
   const [newSlotWidth, setNewSlotWidth] = useState(140);
-  const [newSlotHeight, setNewSlotHeight] = useState(50);
+  const [newSlotHeight, setNewSlotHeight] = useState(40);
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [templateType, setTemplateType] = useState('custom');
   const [newSlotType, setNewSlotType] = useState('slot');
