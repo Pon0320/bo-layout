@@ -26,6 +26,7 @@ function App() {
   const [newSlotHeight, setNewSlotHeight] = useState(50);
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [templateType, setTemplateType] = useState('custom');
+  const [newSlotType, setNewSlotType] = useState('slot');
 
   useEffect(() => {
     if (templateType === 'vertical') {
@@ -135,7 +136,8 @@ function App() {
       name: newSlotName,
       position: { x: 20, y: 20 },
       size: { width: Number(newSlotWidth), height: Number(newSlotHeight) },
-      floorId: activeFloorId
+      floorId: activeFloorId,
+      type: newSlotType
     };
     try {
       const docRef = await addDoc(collection(db, "layoutSlots"), newSlotData);
@@ -144,9 +146,10 @@ function App() {
       setNewSlotWidth(140);
       setNewSlotHeight(50);
       setTemplateType('custom');
+      setNewSlotType('slot');
     } catch (error) {
-      console.error("スロットの追加中にエラーが発生しました:", error);
-      alert("スロットの追加中にエラーが発生しました。");
+      console.error("オブジェクトの追加中にエラーが発生しました:", error);
+      alert("オブジェクトの追加中にエラーが発生しました。");
     }
   };
   
@@ -165,7 +168,7 @@ function App() {
   };
 
   const handleDeleteSlot = async (slotIdToDelete) => {
-    if (window.confirm("このスロットを完全に削除しますか？この操作は元に戻せません。")) {
+    if (window.confirm("このオブジェクトを完全に削除しますか？この操作は元に戻せません。")) {
       try {
         const slotRef = doc(db, "layoutSlots", slotIdToDelete);
         const assignmentRef = doc(db, "slotAssignments", slotIdToDelete);
@@ -177,8 +180,8 @@ function App() {
         setSlotAssignments(prev => prev.filter(a => a.slotId !== slotIdToDelete));
         setEditingSlotId(null);
       } catch (error) {
-        console.error("スロットの削除中にエラーが発生しました:", error);
-        alert("スロットの削除中にエラーが発生しました。");
+        console.error("オブジェクトの削除中にエラーが発生しました:", error);
+        alert("オブジェクトの削除中にエラーが発生しました。");
       }
     }
   };
@@ -234,29 +237,41 @@ function App() {
             <summary className="collapsible-summary">追加・管理メニュー</summary>
             <div className="collapsible-content">
               <div className="sidebar-section">
-                <h3>スロットを追加</h3>
+                <h3>オブジェクトを追加</h3>
                 <form onSubmit={handleAddSlot} className="sidebar-form add-slot-form">
                   <div className="template-selector">
                     <label>
-                      <input type="radio" value="custom" checked={templateType === 'custom'} onChange={(e) => setTemplateType(e.target.value)} />
-                      カスタム
+                      <input type="radio" value="slot" checked={newSlotType === 'slot'} onChange={(e) => setNewSlotType(e.target.value)} />
+                      棚
                     </label>
                     <label>
-                      <input type="radio" value="vertical" checked={templateType === 'vertical'} onChange={(e) => setTemplateType(e.target.value)} />
-                      縦長 (幅40)
-                    </label>
-                    <label>
-                      <input type="radio" value="horizontal" checked={templateType === 'horizontal'} onChange={(e) => setTemplateType(e.target.value)} />
-                      横長 (高さ40)
+                      <input type="radio" value="fixture" checked={newSlotType === 'fixture'} onChange={(e) => setNewSlotType(e.target.value)} />
+                      設備
                     </label>
                   </div>
-                  <input type="text" placeholder="新しいスロット名" value={newSlotName} onChange={(e) => setNewSlotName(e.target.value)} required />
+                  {newSlotType === 'slot' && (
+                    <div className="template-selector">
+                      <label>
+                        <input type="radio" value="custom" checked={templateType === 'custom'} onChange={(e) => setTemplateType(e.target.value)} />
+                        カスタム
+                      </label>
+                      <label>
+                        <input type="radio" value="vertical" checked={templateType === 'vertical'} onChange={(e) => setTemplateType(e.target.value)} />
+                        縦長 (幅40)
+                      </label>
+                      <label>
+                        <input type="radio" value="horizontal" checked={templateType === 'horizontal'} onChange={(e) => setTemplateType(e.target.value)} />
+                        横長 (高さ40)
+                      </label>
+                    </div>
+                  )}
+                  <input type="text" placeholder="新しいオブジェクト名" value={newSlotName} onChange={(e) => setNewSlotName(e.target.value)} required />
                   <div className="size-inputs">
-                    <input type="number" placeholder="横幅" value={newSlotWidth} onChange={(e) => setNewSlotWidth(e.target.value)} className="size-input" step={GRID_SIZE} disabled={templateType === 'vertical'} />
+                    <input type="number" placeholder="横幅" value={newSlotWidth} onChange={(e) => setNewSlotWidth(e.target.value)} className="size-input" step={GRID_SIZE} disabled={templateType === 'vertical' && newSlotType === 'slot'} />
                     <span>x</span>
-                    <input type="number" placeholder="高さ" value={newSlotHeight} onChange={(e) => setNewSlotHeight(e.target.value)} className="size-input" step={GRID_SIZE} disabled={templateType === 'horizontal'} />
+                    <input type="number" placeholder="高さ" value={newSlotHeight} onChange={(e) => setNewSlotHeight(e.target.value)} className="size-input" step={GRID_SIZE} disabled={templateType === 'horizontal' && newSlotType === 'slot'} />
                   </div>
-                  <button type="submit">スロット追加</button>
+                  <button type="submit">追加</button>
                 </form>
               </div>
               <div className="sidebar-section">
@@ -312,8 +327,6 @@ function App() {
         {!isSidebarVisible && (
           <button onClick={() => setIsSidebarVisible(true)} className="toggle-sidebar-button show-button">▶</button>
         )}
-        
-        {/* ★★★ フロアタブのJSXをここに追加 ★★★ */}
         <div className="floor-tabs">
           {floors.map(floor => (
             <button 
@@ -325,13 +338,12 @@ function App() {
             </button>
           ))}
         </div>
-
         <TransformWrapper
           initialScale={1}
           minScale={0.2}
           maxScale={3}
           limitToBounds={false}
-          panning={{ disabled: isEditMode, excluded: ["slot-container"] }}
+          panning={{ excluded: ["slot-container"] }}
           wheel={{ step: 0.1 }}
           doubleClick={{ disabled: true }}
         >
@@ -351,11 +363,10 @@ function App() {
                         slotData={slot}
                         isEditMode={isEditMode}
                         onSlotClick={() => {
-                          if (!isEditMode) {
+                          if (!isEditMode && slot.type !== 'fixture') {
                             setEditingSlotId(slot.id);
                           }
                         }}
-                        onDeleteSlot={handleDeleteSlot}
                       />
                     ))}
                   </div>
