@@ -10,6 +10,8 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 const GRID_SIZE = 20;
 
 function App() {
+  const [floors, setFloors] = useState([]);
+  const [activeFloorId, setActiveFloorId] = useState(null);
   const [layoutSlots, setLayoutSlots] = useState([]);
   const [categories, setCategories] = useState([]);
   const [slotAssignments, setSlotAssignments] = useState([]);
@@ -20,7 +22,7 @@ function App() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [newSlotName, setNewSlotName] = useState('');
   const [newSlotWidth, setNewSlotWidth] = useState(140);
-  const [newSlotHeight, setNewSlotHeight] = useState(40);
+  const [newSlotHeight, setNewSlotHeight] = useState(50);
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [templateType, setTemplateType] = useState('custom');
 
@@ -35,23 +37,33 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [layoutSnapshot, categorySnapshot, assignmentSnapshot] = await Promise.all([
+        const [floorSnapshot, layoutSnapshot, categorySnapshot, assignmentSnapshot] = await Promise.all([
+          getDocs(query(collection(db, 'floors'), orderBy("order"))),
           getDocs(collection(db, 'layoutSlots')),
           getDocs(query(collection(db, "categories"), orderBy("name"))),
           getDocs(collection(db, 'slotAssignments'))
         ]);
+        
+        const floorData = floorSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const layoutData = layoutSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const categoryData = categorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const assignmentData = assignmentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        setFloors(floorData);
         setLayoutSlots(layoutData);
         setCategories(categoryData);
         setSlotAssignments(assignmentData);
+
+        if (floorData.length > 0 && !activeFloorId) {
+          setActiveFloorId(floorData[0].id);
+        }
+
       } catch (error) {
         console.error("データの読み込み中にエラーが発生しました:", error);
       }
     };
     fetchData();
-  }, []);
+  }, [activeFloorId]);
 
   const handleDragEnd = async (event) => {
     const { active, delta } = event;
@@ -106,21 +118,22 @@ function App() {
 
   const handleAddSlot = async (e) => {
     e.preventDefault();
-    if (!newSlotName) {
-      alert('新しいスロットの名前を入力してください。');
+    if (!newSlotName || !activeFloorId) {
+      alert('スロット名を入力し、フロアを選択してください。');
       return;
     }
     const newSlotData = {
       name: newSlotName,
       position: { x: 20, y: 20 },
-      size: { width: Number(newSlotWidth), height: Number(newSlotHeight) }
+      size: { width: Number(newSlotWidth), height: Number(newSlotHeight) },
+      floorId: activeFloorId
     };
     try {
       const docRef = await addDoc(collection(db, "layoutSlots"), newSlotData);
       setLayoutSlots(prev => [...prev, { id: docRef.id, ...newSlotData }]);
       setNewSlotName('');
       setNewSlotWidth(140);
-      setNewSlotHeight(40);
+      setNewSlotHeight(50);
       setTemplateType('custom');
     } catch (error) {
       console.error("スロットの追加中にエラーが発生しました:", error);
@@ -170,15 +183,17 @@ function App() {
     return { ...slot, assignedCategory, parentCategory };
   });
 
-  const filteredSlots = displaySlots.filter(slot => {
-    const slotName = slot.name || '';
-    const categoryName = slot.assignedCategory ? slot.assignedCategory.name : '';
-    const parentName = slot.parentCategory ? slot.parentCategory.name : '';
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return slotName.toLowerCase().includes(lowerCaseSearchTerm) || 
-           categoryName.toLowerCase().includes(lowerCaseSearchTerm) ||
-           parentName.toLowerCase().includes(lowerCaseSearchTerm);
-  });
+  const filteredSlots = displaySlots
+    .filter(slot => slot.floorId === activeFloorId)
+    .filter(slot => {
+      const slotName = slot.name || '';
+      const categoryName = slot.assignedCategory ? slot.assignedCategory.name : '';
+      const parentName = slot.parentCategory ? slot.parentCategory.name : '';
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      return slotName.toLowerCase().includes(lowerCaseSearchTerm) || 
+            categoryName.toLowerCase().includes(lowerCaseSearchTerm) ||
+            parentName.toLowerCase().includes(lowerCaseSearchTerm);
+    });
 
   const editingSlot = editingSlotId ? displaySlots.find(slot => slot.id === editingSlotId) : null;
   const parentCategories = categories.filter(cat => !cat.parentId);
@@ -272,6 +287,17 @@ function App() {
         {!isSidebarVisible && (
           <button onClick={() => setIsSidebarVisible(true)} className="toggle-sidebar-button show-button">▶</button>
         )}
+        <div className="floor-tabs">
+          {floors.map(floor => (
+            <button 
+              key={floor.id}
+              className={`floor-tab ${floor.id === activeFloorId ? 'active' : ''}`}
+              onClick={() => setActiveFloorId(floor.id)}
+            >
+              {floor.name}
+            </button>
+          ))}
+        </div>
         <TransformWrapper
           initialScale={1}
           minScale={0.2}
