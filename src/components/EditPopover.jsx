@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './EditPopover.css';
 
-function EditPopover({ slotData, allCategories, onAssignmentChange, onSlotSizeChange, onDeleteSlot, onClose, gridSize }) {
-  const { id, name, position, size, assignedCategory } = slotData;
+function EditPopover({ slotData, allCategories, isEditMode, onAssignmentChange, onSlotSizeChange, onDeleteSlot, onClose, gridSize }) {
+  const { id, name, position, size, assignedCategory, type } = slotData;
 
   const [currentWidth, setCurrentWidth] = useState(size ? size.width : 140);
   const [currentHeight, setCurrentHeight] = useState(size ? size.height : 50);
@@ -31,34 +31,33 @@ function EditPopover({ slotData, allCategories, onAssignmentChange, onSlotSizeCh
   const parentCategories = allCategories.filter(cat => !cat.parentId);
   const childCategories = allCategories.filter(cat => cat.parentId);
 
-  // ★★★ 位置計算の popoverStyle は不要なので削除されています ★★★
-
   return (
     <>
       <div className="popover-overlay" onClick={onClose}></div>
-      {/* ★★★ style属性を削除し、CSSだけで位置を制御します ★★★ */}
       <div className="edit-popover">
         <h3>{name}</h3>
         
-        <div className="popover-section">
-          <p>カテゴリを選択</p>
-          <select 
-            value={assignedCategory ? assignedCategory.id : ''} 
-            onChange={handleSelectChange}
-          >
-            <option value="">（未割り当て）</option>
-            {parentCategories.map(parent => (
-              <optgroup key={parent.id} label={parent.name}>
-                {childCategories
-                  .filter(child => child.parentId === parent.id)
-                  .map(child => (
-                    <option key={child.id} value={child.id}>{child.name}</option>
-                  ))
-                }
-              </optgroup>
-            ))}
-          </select>
-        </div>
+        {type === 'slot' && !isEditMode && (
+          <div className="popover-section">
+            <p>カテゴリを選択</p>
+            <select 
+              value={assignedCategory ? assignedCategory.id : ''} 
+              onChange={handleSelectChange}
+            >
+              <option value="">（未割り当て）</option>
+              {parentCategories.map(parent => (
+                <optgroup key={parent.id} label={parent.name}>
+                  {childCategories
+                    .filter(child => child.parentId === parent.id)
+                    .map(child => (
+                      <option key={child.id} value={child.id}>{child.name}</option>
+                    ))
+                  }
+                </optgroup>
+              ))}
+            </select>
+          </div>
+        )}
         
         <div className="popover-section">
             <p>サイズを変更 (px)</p>
@@ -85,7 +84,7 @@ function EditPopover({ slotData, allCategories, onAssignmentChange, onSlotSizeCh
         </div>
 
         <div className="popover-section danger-zone">
-            <button onClick={handleDeleteClick} className="delete-button-popover">このスロットを削除</button>
+            <button onClick={handleDeleteClick} className="delete-button-popover">このオブジェクトを削除</button>
         </div>
       </div>
     </>

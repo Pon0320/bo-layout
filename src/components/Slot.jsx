@@ -29,19 +29,14 @@ function Slot({ slotData, isEditMode, onSlotClick }) {
 
   const isVertical = size.height > size.width;
   const draggableProps = isEditMode ? { ...listeners, ...attributes } : {};
-  const containerClassName = `slot-container ${isEditMode ? 'draggable' : (isFixture ? '' : 'clickable')} ${isVertical ? 'vertical' : ''} ${isFixture ? 'fixture' : ''}`;
-
-  const handleSlotClick = () => {
-    if (isFixture) return;
-    onSlotClick();
-  };
+  const containerClassName = `slot-container ${isEditMode ? 'draggable' : 'clickable'} ${isVertical ? 'vertical' : ''} ${isFixture ? 'fixture' : ''}`;
 
   return (
     <div
       ref={setNodeRef}
       style={{ ...slotStyle, ...style }} 
       className={containerClassName}
-      onClick={handleSlotClick}
+      onClick={onSlotClick}
       {...draggableProps}
     >
       <div className="slot-info">

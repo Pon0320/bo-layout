@@ -23,7 +23,7 @@ function App() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [newSlotName, setNewSlotName] = useState('');
   const [newSlotWidth, setNewSlotWidth] = useState(140);
-  const [newSlotHeight, setNewSlotHeight] = useState(40);
+  const [newSlotHeight, setNewSlotHeight] = useState(50);
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [templateType, setTemplateType] = useState('custom');
   const [newSlotType, setNewSlotType] = useState('slot');
@@ -363,7 +363,7 @@ function App() {
                         slotData={slot}
                         isEditMode={isEditMode}
                         onSlotClick={() => {
-                          if (!isEditMode && slot.type !== 'fixture') {
+                          if (!isEditMode) {
                             setEditingSlotId(slot.id);
                           }
                         }}
@@ -375,10 +375,11 @@ function App() {
             </>
           )}
         </TransformWrapper>
-        {editingSlot && !isEditMode && (
+        {editingSlot && (
           <EditPopover
             slotData={editingSlot}
             allCategories={categories}
+            isEditMode={isEditMode}
             onAssignmentChange={handleAssignmentChange}
             onSlotSizeChange={handleSlotSizeChange}
             onDeleteSlot={handleDeleteSlot}

@@ -6,17 +6,13 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 100;
-  /* display: flexなどは不要 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .edit-popover {
-  /* ★★★ こちらが新しい中央寄せの記述です ★★★ */
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  /* ★★★ ここまで ★★★ */
-
+  position: relative;
   background-color: white;
   padding: 20px;
   border-radius: 8px;
@@ -33,6 +29,10 @@
   margin-top: 0;
   font-size: 18px;
   color: #333;
+}
+
+.popover-section {
+  /* No specific styles needed for this section wrapper */
 }
 
 .popover-section p {
