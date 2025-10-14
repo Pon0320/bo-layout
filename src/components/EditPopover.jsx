@@ -32,9 +32,8 @@ function EditPopover({ slotData, allCategories, isEditMode, onAssignmentChange, 
   const childCategories = allCategories.filter(cat => cat.parentId);
 
   return (
-    <>
-      <div className="popover-overlay" onClick={onClose}></div>
-      <div className="edit-popover">
+    <div className="popover-overlay" onClick={onClose}>
+      <div className="edit-popover" onClick={(e) => e.stopPropagation()}>
         <h3>{name}</h3>
         
         {type === 'slot' && !isEditMode && (
@@ -87,7 +86,7 @@ function EditPopover({ slotData, allCategories, isEditMode, onAssignmentChange, 
             <button onClick={handleDeleteClick} className="delete-button-popover">このオブジェクトを削除</button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

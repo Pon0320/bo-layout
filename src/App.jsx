@@ -375,19 +375,19 @@ function App() {
             </>
           )}
         </TransformWrapper>
-        {editingSlot && (
-          <EditPopover
-            slotData={editingSlot}
-            allCategories={categories}
-            isEditMode={isEditMode}
-            onAssignmentChange={handleAssignmentChange}
-            onSlotSizeChange={handleSlotSizeChange}
-            onDeleteSlot={handleDeleteSlot}
-            onClose={() => setEditingSlotId(null)}
-            gridSize={GRID_SIZE}
-          />
-        )}
       </main>
+      {editingSlot && (
+        <EditPopover
+          slotData={editingSlot}
+          allCategories={categories}
+          isEditMode={isEditMode}
+          onAssignmentChange={handleAssignmentChange}
+          onSlotSizeChange={handleSlotSizeChange}
+          onDeleteSlot={handleDeleteSlot}
+          onClose={() => setEditingSlotId(null)}
+          gridSize={GRID_SIZE}
+        />
+      )}
     </div>
   );
 }
